@@ -18,6 +18,7 @@
 using IBM.WatsonDeveloperCloud.PersonalityInsights.v3;
 using IBM.WatsonDeveloperCloud.PersonalityInsights.v3.Model;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace IBM.WatsonDeveloperCloud.PersonalityInsights.Example
@@ -38,13 +39,29 @@ namespace IBM.WatsonDeveloperCloud.PersonalityInsights.Example
         {
             Console.WriteLine("Calling GetProfile()...");
 
+            string content = "The IBM Watson™ Personality Insights service provides a Representational State Transfer (REST) Application Programming Interface (API) that enables applications to derive insights from social media, enterprise data, or other digital communications. The service uses linguistic analytics to infer individuals' intrinsic personality characteristics, including Big Five, Needs, and Values, from digital communications such as email, text messages, tweets, and forum posts. The service can automatically infer, from potentially noisy social media, portraits of individuals that reflect their personality characteristics. The service can report consumption preferences based on the results of its analysis, and for JSON content that is timestamped, it can report temporal behavior.";
+
+            //  Test Profile
+            ContentListContainer contentListContainer = new ContentListContainer()
+            {
+                ContentItems = new List<ContentItem>()
+                {
+                    new ContentItem()
+                    {
+                        Contenttype = ContentItem.ContenttypeEnum.TEXT_PLAIN,
+                        Language = ContentItem.LanguageEnum.EN,
+                        Content = content
+                    }
+                }
+            };
+
             var result =
                 _personalityInsight.GetProfile(ProfileOptions.CreateOptions()
                                                              .WithTextPlain()
                                                              .AsEnglish()
                                                              .AcceptJson()
                                                              .AcceptEnglishLanguage()
-                                                             .WithBody("some text"));
+                                                             .WithBody(contentListContainer));
 
             if (result != null)
             {

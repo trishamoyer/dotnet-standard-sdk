@@ -1,4 +1,7 @@
-﻿/**
+﻿
+
+using Newtonsoft.Json.Linq;
+/**
 * Copyright 2017 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +17,8 @@
 * limitations under the License.
 *
 */
-
 using System;
+using System.IO;
 
 namespace IBM.WatsonDeveloperCloud.PersonalityInsights.Example
 {
@@ -25,6 +28,18 @@ namespace IBM.WatsonDeveloperCloud.PersonalityInsights.Example
         {
             string _username = "<username>";
             string _password = "<password>";
+
+            var environmentVariable =
+            Environment.GetEnvironmentVariable("VCAP_SERVICES");
+
+            var fileContent =
+            File.ReadAllText(environmentVariable);
+
+            var vcapServices =
+            JObject.Parse(fileContent);
+
+            _username = vcapServices["personality_insights"][0]["credentials"]["username"].Value<string>();
+            _password = vcapServices["personality_insights"][0]["credentials"]["password"].Value<string>();
 
             PersonalityInsightsServiceExample _personalityInsightsExample = new PersonalityInsightsServiceExample(_username, _password);
             Console.ReadKey();

@@ -21,6 +21,9 @@ using IBM.WatsonDeveloperCloud.Http;
 using IBM.WatsonDeveloperCloud.PersonalityInsights.v3.Model;
 using IBM.WatsonDeveloperCloud.Service;
 using System.Runtime.ExceptionServices;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace IBM.WatsonDeveloperCloud.PersonalityInsights.v3
 {
@@ -79,13 +82,22 @@ namespace IBM.WatsonDeveloperCloud.PersonalityInsights.v3
                         break;
                 }
 
-                int bodySize = enc.GetByteCount(options.Text) / 1024 / 1024;
+                //int bodySize = enc.GetByteCount(options.Text) / 1024 / 1024;
 
-
-
+                ByteArrayContent content = new ByteArrayContent(Encoding.ASCII.GetBytes(JsonConvert.SerializeObject(options.ContentItems)));
+                
                 result =
                      this.Client.WithAuthentication(UserName, Password)
                                 .PostAsync($"{this.Endpoint}{PATH_GET_PROFILES}")
+                                .WithArgument("version", "2016-10-20")
+                                .WithHeader("Content-Type", options.ContentType)
+                                .WithHeader("Content-Language", options.Language)
+                                .WithHeader("Accept", options.Accept)
+                                .WithHeader("Accept-Language", options.AcceptLanguage)
+                                .WithArgument("raw_scores", options.IncludeRaw)
+                                .WithArgument("csv_headers", options.CsvHeaders)
+                                .WithArgument("consumption_preferences", options.ConsumptionPreferences)
+                                .WithBodyContent(content)
                                 .As<Profile>()
                                 .Result;
             }
