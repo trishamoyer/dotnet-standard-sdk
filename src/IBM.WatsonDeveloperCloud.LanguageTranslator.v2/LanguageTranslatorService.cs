@@ -1,5 +1,5 @@
 /**
-* Copyright 2017 IBM Corp. All Rights Reserved.
+* Copyright 2018 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,11 +15,8 @@
 *
 */
 
-using System.IO;
-using System.Net.Http;
 using System.Text;
 using IBM.WatsonDeveloperCloud.Http;
-using IBM.WatsonDeveloperCloud.Http.Extensions;
 using IBM.WatsonDeveloperCloud.LanguageTranslator.v2.Model;
 using IBM.WatsonDeveloperCloud.Service;
 using System;
@@ -55,17 +52,17 @@ namespace IBM.WatsonDeveloperCloud.LanguageTranslator.v2
             this.Client = httpClient;
         }
 
-        public TranslationResult Translate(TranslateRequest body)
+        public TranslationResult Translate(TranslateRequest request)
         {
-            if (body == null)
-                throw new ArgumentNullException(nameof(body));
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
             TranslationResult result = null;
 
             try
             {
                 result = this.Client.WithAuthentication(this.UserName, this.Password)
                                 .PostAsync($"{this.Endpoint}/v2/translate")
-                                .WithBody<TranslateRequest>(body)
+                                .WithBody<TranslateRequest>(request)
                                 .As<TranslationResult>()
                                 .Result;
             }
@@ -77,6 +74,28 @@ namespace IBM.WatsonDeveloperCloud.LanguageTranslator.v2
             return result;
         }
         public IdentifiedLanguages Identify(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentNullException(nameof(text));
+            IdentifiedLanguages result = null;
+
+            try
+            {
+                result = this.Client.WithAuthentication(this.UserName, this.Password)
+                                .PostAsync($"{this.Endpoint}/v2/identify")
+                                .WithBodyContent(new StringContent(text, Encoding.UTF8, HttpMediaType.TEXT_PLAIN))
+                                .As<IdentifiedLanguages>()
+                                .Result;
+            }
+            catch(AggregateException ae)
+            {
+                throw ae.Flatten();
+            }
+
+            return result;
+        }
+
+        public IdentifiedLanguages IdentifyPlain(string text)
         {
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentNullException(nameof(text));
@@ -130,7 +149,7 @@ namespace IBM.WatsonDeveloperCloud.LanguageTranslator.v2
                 {
                     var forcedGlossaryContent = new ByteArrayContent((forcedGlossary as Stream).ReadAllBytes());
                     System.Net.Http.Headers.MediaTypeHeaderValue contentType;
-                    System.Net.Http.Headers.MediaTypeHeaderValue.TryParse("application/octet-stream", out contentType);
+                    System.Net.Http.Headers.MediaTypeHeaderValue.TryParse(forcedGlossaryContentType, out contentType);
                     forcedGlossaryContent.Headers.ContentType = contentType;
                     formData.Add(forcedGlossaryContent, "forced_glossary", "filename");
                 }
@@ -139,7 +158,7 @@ namespace IBM.WatsonDeveloperCloud.LanguageTranslator.v2
                 {
                     var parallelCorpusContent = new ByteArrayContent((parallelCorpus as Stream).ReadAllBytes());
                     System.Net.Http.Headers.MediaTypeHeaderValue contentType;
-                    System.Net.Http.Headers.MediaTypeHeaderValue.TryParse("application/octet-stream", out contentType);
+                    System.Net.Http.Headers.MediaTypeHeaderValue.TryParse(parallelCorpusContentType, out contentType);
                     parallelCorpusContent.Headers.ContentType = contentType;
                     formData.Add(parallelCorpusContent, "parallel_corpus", "filename");
                 }
@@ -148,7 +167,7 @@ namespace IBM.WatsonDeveloperCloud.LanguageTranslator.v2
                 {
                     var monolingualCorpusContent = new ByteArrayContent((monolingualCorpus as Stream).ReadAllBytes());
                     System.Net.Http.Headers.MediaTypeHeaderValue contentType;
-                    System.Net.Http.Headers.MediaTypeHeaderValue.TryParse("text/plain", out contentType);
+                    System.Net.Http.Headers.MediaTypeHeaderValue.TryParse(monolingualCorpusContentType, out contentType);
                     monolingualCorpusContent.Headers.ContentType = contentType;
                     formData.Add(monolingualCorpusContent, "monolingual_corpus", "filename");
                 }
