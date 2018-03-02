@@ -1,5 +1,5 @@
 /**
-* Copyright 2017 IBM Corp. All Rights Reserved.
+* Copyright 2018 IBM Corp. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -64,6 +64,41 @@ namespace IBM.WatsonDeveloperCloud.PersonalityInsights.v3
         }
 
         public Profile Profile(Content content, string contentType, string contentLanguage = null, string acceptLanguage = null, bool? rawScores = null, bool? csvHeaders = null, bool? consumptionPreferences = null)
+        {
+            if (content == null)
+                throw new ArgumentNullException(nameof(content));
+            if (string.IsNullOrEmpty(contentType))
+                throw new ArgumentNullException(nameof(contentType));
+
+            if(string.IsNullOrEmpty(VersionDate))
+                throw new ArgumentNullException("versionDate cannot be null.");
+
+            Profile result = null;
+
+            try
+            {
+                result = this.Client.WithAuthentication(this.UserName, this.Password)
+                                .PostAsync($"{this.Endpoint}/v3/profile")
+                                .WithArgument("version", VersionDate)
+                                .WithHeader("Content-Type", contentType)
+                                .WithHeader("Content-Language", contentLanguage)
+                                .WithHeader("Accept-Language", acceptLanguage)
+                                .WithArgument("raw_scores", rawScores)
+                                .WithArgument("csv_headers", csvHeaders)
+                                .WithArgument("consumption_preferences", consumptionPreferences)
+                                .WithBody<Content>(content)
+                                .As<Profile>()
+                                .Result;
+            }
+            catch(AggregateException ae)
+            {
+                throw ae.Flatten();
+            }
+
+            return result;
+        }
+
+        public Profile ProfileCsv(Content content, string contentType, string contentLanguage = null, string acceptLanguage = null, bool? rawScores = null, bool? csvHeaders = null, bool? consumptionPreferences = null)
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
