@@ -20,22 +20,30 @@ using Newtonsoft.Json;
 namespace IBM.WatsonDeveloperCloud.VisualRecognition.v3.Model
 {
     /// <summary>
-    /// Information about something that went wrong.
+    /// Provides information about the face.
     /// </summary>
-    public class WarningInfo
+    public class Face
     {
         /// <summary>
-        /// Codified warning string, such as `limit_reached`.
+        /// Gets or Sets Age
         /// </summary>
-        /// <value>Codified warning string, such as `limit_reached`.</value>
-        [JsonProperty("warning_id", NullValueHandling = NullValueHandling.Ignore)]
-        public string WarningId { get; set; }
+        [JsonProperty("age", NullValueHandling = NullValueHandling.Ignore)]
+        public FaceAge Age { get; set; }
         /// <summary>
-        /// Information about the error.
+        /// Gets or Sets Gender
         /// </summary>
-        /// <value>Information about the error.</value>
-        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
-        public string Description { get; set; }
+        [JsonProperty("gender", NullValueHandling = NullValueHandling.Ignore)]
+        public FaceGender Gender { get; set; }
+        /// <summary>
+        /// Gets or Sets FaceLocation
+        /// </summary>
+        [JsonProperty("face_location", NullValueHandling = NullValueHandling.Ignore)]
+        public FaceLocation FaceLocation { get; set; }
+        /// <summary>
+        /// Gets or Sets Identity
+        /// </summary>
+        [JsonProperty("identity", NullValueHandling = NullValueHandling.Ignore)]
+        public FaceIdentity Identity { get; set; }
     }
 
 }
